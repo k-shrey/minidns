@@ -66,7 +66,7 @@ func ReadDnsRecord(buf *Packet) DnsRecord {
 	return record
 }
 
-func (d *DnsRecord) WriteDnsRecord(buf *Packet) int {
+func (d *DnsRecord) writeDnsRecord(buf *Packet) int {
 	startPos := buf.pos
 
 	if d.RecordType == 1 {

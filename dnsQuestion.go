@@ -16,16 +16,16 @@ func NewDnsQuestion(name string, qtype QueryType) DnsQuestion {
 	return q
 }
 
-func (d *DnsQuestion) Read(buf *Packet) {
+func (d *DnsQuestion) read(buf *Packet) {
 	d.name, _ = buf.readQName()
 	d.qtype = QueryType(buf.readU16())
 	buf.readU16()
 	// fmt.Println(k)
 }
 
-func (d *DnsQuestion) Write(buf *Packet) {
+func (d *DnsQuestion) write(buf *Packet) {
 	buf.writeQName(d.name)
-	
+
 	typenum := d.qtype
 	buf.writeU16(uint16(typenum))
 	buf.writeU16(1)
