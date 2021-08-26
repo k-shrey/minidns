@@ -1,7 +1,5 @@
 package main
 
-// import "fmt"
-
 type DnsQuestion struct {
 	name  string
 	qtype QueryType
@@ -18,9 +16,11 @@ func NewDnsQuestion(name string, qtype QueryType) DnsQuestion {
 
 func (d *DnsQuestion) read(buf *Packet) {
 	d.name, _ = buf.readQName()
+	// fmt.Println("d.name is", d.name)
 	d.qtype = QueryType(buf.readU16())
+	// fmt.Println("d.qtype is", d.qtype)
 	buf.readU16()
-	// fmt.Println(k)
+	// fmt.Println("class is", class)
 }
 
 func (d *DnsQuestion) write(buf *Packet) {

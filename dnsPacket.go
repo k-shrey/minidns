@@ -1,6 +1,5 @@
 package main
 
-// import "fmt"
 
 type DnsPacket struct {
 	header      DnsHeader
@@ -10,9 +9,9 @@ type DnsPacket struct {
 	resources   []DnsRecord
 }
 
-func NewDnsPacket() DnsPacket {
-	dnsPacket := DnsPacket{
-		header:      DnsHeader{},
+func NewDnsPacket() *DnsPacket {
+	dnsPacket := &DnsPacket{
+		header:      *NewDnsHeader(),
 		questions:   []DnsQuestion{},
 		answers:     []DnsRecord{},
 		authorities: []DnsRecord{},
@@ -21,10 +20,10 @@ func NewDnsPacket() DnsPacket {
 	return dnsPacket
 }
 
-func FromBuffer(buf *Packet) DnsPacket {
+func FromBuffer(buf *Packet) *DnsPacket {
 	result := NewDnsPacket()
 	result.header.read(buf)
-	// fmt.Printf("inside from buf: %#v", result.header)
+	// fmt.Printf("inside from buf: %#v", result.header.questions)
 	for i := 0; i < int(result.header.questions); i++ {
 		question := NewDnsQuestion("", UNKNOWN)
 		question.read(buf)
@@ -33,7 +32,7 @@ func FromBuffer(buf *Packet) DnsPacket {
 
 	// by, _ := buf.get(buf.pos + 1)
 
-	// fmt.Printf("now next byte is: %#x", by)
+	// fmt.Printf("now next uint8 is: %#x", by)
 	for i := 0; i < int(result.header.answers); i++ {
 		answers := ReadDnsRecord(buf)
 		result.answers = append(result.answers, answers)

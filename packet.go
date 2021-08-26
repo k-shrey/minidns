@@ -6,7 +6,7 @@ import (
 )
 
 type Packet struct {
-	buf [512]byte
+	buf [512]uint8
 	pos int
 }
 
@@ -25,8 +25,8 @@ func (p *Packet) seek(pos int) {
 	p.pos = pos
 }
 
-// read one byte and increment position
-func (p *Packet) read() (byte, error) {
+// read one uint8 and increment position
+func (p *Packet) read() (uint8, error) {
 	if p.pos >= 512 {
 		return 0, errors.New("end of buffer")
 	}
@@ -36,8 +36,8 @@ func (p *Packet) read() (byte, error) {
 	return res, nil
 }
 
-//read one byte without incrementing position
-func (p Packet) get(pos int) (byte, error) {
+//read one uint8 without incrementing position
+func (p Packet) get(pos int) (uint8, error) {
 	if p.pos >= 512 {
 		return 0, errors.New("end of buffer")
 	}
@@ -46,7 +46,7 @@ func (p Packet) get(pos int) (byte, error) {
 	return res, nil
 }
 
-func (p Packet) getRange(start, len int) ([]byte, error) {
+func (p Packet) getRange(start, len int) ([]uint8, error) {
 	if start+len >= 512 {
 		return nil, errors.New("end of buffer")
 	}
@@ -81,7 +81,7 @@ func (p *Packet) readQName() (string, error) {
 	outbuf := ""
 	// handle jumps in the case of compressed records
 	jumped := false
-	maxJumps := 5
+	maxJumps := 10
 	jumps := 0
 
 	delim := ""
@@ -91,7 +91,7 @@ func (p *Packet) readQName() (string, error) {
 			return "", errors.New("limit of jumps exceeded")
 		}
 
-		//read length byte
+		//read length uint8
 		len, err := p.get(pos)
 		if err != nil {
 			return "", err
@@ -99,14 +99,14 @@ func (p *Packet) readQName() (string, error) {
 
 		// if the 2 most significant bits are set,
 		// then jump to some other offset in the packet
-		if len&0xC0 == 0xC0 {
+		if (len & 0xC0) == 0xC0 {
 
 			// Update position to after the current label
 			if !jumped {
 				p.seek(pos + 2)
 			}
 
-			//read the next byte
+			//read the next uint8
 			secondByte, err := p.get(pos + 1)
 			if err != nil {
 				return "", err
@@ -122,7 +122,7 @@ func (p *Packet) readQName() (string, error) {
 		} else {
 			// default case, no jumps. Read a single label and append it to the output
 
-			// move  past the length byte
+			// move  past the length uint8
 			pos += 1
 
 			// if the length is 0, we have reached the end of the domain name
@@ -186,7 +186,7 @@ func (p *Packet) writeQName(qname string) error {
 		}
 
 		p.write(uint8(len))
-		for _, c := range []byte(label) {
+		for _, c := range []uint8(label) {
 			p.write(c)
 		}
 	}

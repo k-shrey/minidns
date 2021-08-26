@@ -1,5 +1,7 @@
 package main
 
+// import "fmt"
+
 type DnsHeader struct {
 	id                  uint16
 	recursionDesired    bool  // 1 bit
@@ -83,31 +85,35 @@ func (h *DnsHeader) write(buf *Packet) {
 		flags |= (1 << 2)
 	}
 
-	flags |= h.opcode << 3
+	flags |= (h.opcode << 3)
 
 	if h.response {
-		flags |= (1 << 4)
-	}
-
-	buf.write(flags)
-
-	//next part
-	flags = 0
-	flags |= h.rescode
-
-	if h.checkingDisabled {
-		flags |= (1 << 4)
-	}
-	if h.authedData {
-		flags |= (1 << 5)
-	}
-	if h.z {
-		flags |= (1 << 6)
-	}
-	if h.recursionAvailable {
 		flags |= (1 << 7)
 	}
 
+	buf.write(flags)
+	// fmt.Printf("flags: %#v\n", flags)
+	//next part
+	flags = uint8(0)
+	flags |= h.rescode
+
+	//shifted all here by -1..should be 4,5,6,7 ??
+	if h.checkingDisabled {
+		flags |= (1 << 3)
+	}
+	if h.authedData {
+		flags |= (1 << 4)
+	}
+	if h.z {
+		flags |= (1 << 5)
+	}
+	if h.recursionAvailable {
+		flags |= (1 << 6)
+	}
+
+	// fmt.Printf("flags part 2: %#v\n and header is: %#v", flags, h)
+	// fmt.Println("flags p2:", flags)
+	buf.write(flags)
 	buf.writeU16(h.questions)
 	buf.writeU16(h.answers)
 	buf.writeU16(h.authoritativeEntries)

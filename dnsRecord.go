@@ -27,7 +27,9 @@ type DnsRecord struct {
 
 func ReadDnsRecord(buf *Packet) DnsRecord {
 	domain, _ := buf.readQName()
+	fmt.Println("domain is:", domain)
 	qType := QueryType(buf.readU16())
+	fmt.Println("qtype is:", qType)
 	buf.readU16()
 	ttl := buf.readU32()
 	dataLength := buf.readU16()
@@ -50,8 +52,9 @@ func ReadDnsRecord(buf *Packet) DnsRecord {
 			},
 			RecordType: 1,
 		}
+
 	case 0:
-		buf.step(int(dataLength))
+		buf.step(dataLength)
 		record = DnsRecord{
 			UNKNOWNRecord: UNKNOWNRecord{
 				domain:     domain,
@@ -66,7 +69,7 @@ func ReadDnsRecord(buf *Packet) DnsRecord {
 	return record
 }
 
-func (d *DnsRecord) writeDnsRecord(buf *Packet) int {
+func (d *DnsRecord) writeDnsRecord(buf *Packet) uint16 {
 	startPos := buf.pos
 
 	if d.RecordType == 1 {
