@@ -7,10 +7,10 @@ type DnsHeader struct {
 	recursionDesired    bool  // 1 bit
 	truncatedMessage    bool  // 1 bit
 	authoritativeAnswer bool  // 1 bit
-	opcode              uint8 // 4 bits, but no representation in golang
+	opcode              uint8 // 4 bits
 	response            bool  // 1 bit
 
-	rescode            uint8 // 4 bits, but no representation in golang
+	rescode            uint8 // 4 bits
 	checkingDisabled   bool  // 1 bit
 	authedData         bool  // 1 bit
 	z                  bool  // 1 bit
@@ -44,7 +44,7 @@ func NewDnsHeader() *DnsHeader {
 }
 
 func (h *DnsHeader) read(buf *Packet) {
-	// fmt.Printf("packet is: %#v", buf.buf)
+
 	h.id = buf.readU16()
 
 	flags := buf.readU16()
@@ -68,7 +68,7 @@ func (h *DnsHeader) read(buf *Packet) {
 	h.answers = buf.readU16()
 	h.authoritativeEntries = buf.readU16()
 	h.resourceEntries = buf.readU16()
-	// fmt.Printf("inside from buf: %#v", h)
+
 }
 
 func (h *DnsHeader) write(buf *Packet) {
@@ -92,7 +92,7 @@ func (h *DnsHeader) write(buf *Packet) {
 	}
 
 	buf.write(flags)
-	// fmt.Printf("flags: %#v\n", flags)
+
 	//next part
 	flags = uint8(0)
 	flags |= h.rescode

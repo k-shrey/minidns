@@ -53,8 +53,8 @@ func ReadDnsRecord(buf *Packet) DnsRecord {
 			RecordType: 1,
 		}
 
-	case 0:
-		buf.step(dataLength)
+	default:
+		buf.step(int(dataLength))
 		record = DnsRecord{
 			UNKNOWNRecord: UNKNOWNRecord{
 				domain:     domain,
@@ -69,7 +69,7 @@ func ReadDnsRecord(buf *Packet) DnsRecord {
 	return record
 }
 
-func (d *DnsRecord) writeDnsRecord(buf *Packet) uint16 {
+func (d *DnsRecord) writeDnsRecord(buf *Packet) int {
 	startPos := buf.pos
 
 	if d.RecordType == 1 {
