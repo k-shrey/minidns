@@ -27,9 +27,7 @@ type DnsRecord struct {
 
 func ReadDnsRecord(buf *Packet) DnsRecord {
 	domain, _ := buf.readQName()
-	fmt.Println("domain is:", domain)
 	qType := QueryType(buf.readU16())
-	fmt.Println("qtype is:", qType)
 	buf.readU16()
 	ttl := buf.readU32()
 	dataLength := buf.readU16()

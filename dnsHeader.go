@@ -1,6 +1,5 @@
 package main
 
-// import "fmt"
 
 type DnsHeader struct {
 	id                  uint16
@@ -97,7 +96,7 @@ func (h *DnsHeader) write(buf *Packet) {
 	flags = uint8(0)
 	flags |= h.rescode
 
-	//shifted all here by -1..should be 4,5,6,7 ??
+	//shifted all by -1..should be 4,5,6,7 ??
 	if h.checkingDisabled {
 		flags |= (1 << 3)
 	}
@@ -111,8 +110,6 @@ func (h *DnsHeader) write(buf *Packet) {
 		flags |= (1 << 6)
 	}
 
-	// fmt.Printf("flags part 2: %#v\n and header is: %#v", flags, h)
-	// fmt.Println("flags p2:", flags)
 	buf.write(flags)
 	buf.writeU16(h.questions)
 	buf.writeU16(h.answers)

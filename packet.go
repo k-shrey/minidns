@@ -61,10 +61,7 @@ func (p *Packet) readU16() uint16 {
 }
 
 func (p *Packet) readU32() uint32 {
-	// res := uint32(p.pos)<<24 |
-	// 	uint32(p.pos)<<16 |
-	// 	uint32(p.pos)<<8 |
-	// 	uint32(p.pos)<<0
+
 	res := uint32(0)
 	for i := 3; i >= 0; i-- {
 		shift := 8 * i
@@ -132,7 +129,7 @@ func (p *Packet) readQName() (string, error) {
 
 			//append delimiter to the output buffer
 			outbuf += delim
-			// fmt.Println("pos is: ", pos)
+			
 			// extract output bytes and append it to the output buffer
 			strBuffer, err := p.getRange(pos, int(len))
 			if err != nil {
@@ -152,7 +149,6 @@ func (p *Packet) readQName() (string, error) {
 		p.seek(pos)
 	}
 
-	// fmt.Println("outbuf: ", *outbuf)
 	return outbuf, nil
 }
 

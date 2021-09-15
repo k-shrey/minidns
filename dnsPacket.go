@@ -23,16 +23,13 @@ func NewDnsPacket() *DnsPacket {
 func FromBuffer(buf *Packet) *DnsPacket {
 	result := NewDnsPacket()
 	result.header.read(buf)
-	// fmt.Printf("inside from buf: %#v", result.header.questions)
+
 	for i := 0; i < int(result.header.questions); i++ {
 		question := NewDnsQuestion("", UNKNOWN)
 		question.read(buf)
 		result.questions = append(result.questions, question)
 	}
 
-	// by, _ := buf.get(buf.pos + 1)
-
-	// fmt.Printf("now next uint8 is: %#x", by)
 	for i := 0; i < int(result.header.answers); i++ {
 		answers := ReadDnsRecord(buf)
 		result.answers = append(result.answers, answers)

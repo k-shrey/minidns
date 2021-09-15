@@ -5,14 +5,19 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
+	_ "net/http/pprof"
 	"sync"
 	"time"
 )
 
 func main() {
 
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+
 	dnsCache := NewDnsCache(60)
-	// qname := "www.yahoo.com"
 	addr := net.UDPAddr{
 		Port: 1053,
 		IP:   net.ParseIP("127.0.0.1"),
@@ -24,8 +29,6 @@ func main() {
 		log.Fatal(err)
 		return
 	}
-
-	// defer ln.Close()
 
 	upstream, err := net.Dial("udp", "8.8.8.8:53")
 	if err != nil {
@@ -59,11 +62,6 @@ func worker(wg *sync.WaitGroup, debug bool, conn *net.UDPConn, addr *net.UDPAddr
 
 	recBuf := NewPacket()
 	recBuf.buf = buf
-	// _, err := bufio.NewReader(*conn).Read(recBuf.buf[:])
-	// if err != nil {
-	// 	fmt.Printf("Some error while reading %v", err)
-	// 	return
-	// }
 	recPacket := FromBuffer(&recBuf)
 	fmt.Printf("Decoded the packet. making another.\n")
 
@@ -97,16 +95,6 @@ func worker(wg *sync.WaitGroup, debug bool, conn *net.UDPConn, addr *net.UDPAddr
 		return
 	}
 
-	// packet := NewDnsPacket()
-	// packet.header.id = uint16(rand.Intn(10000))
-	// packet.header.questions = 1
-	// packet.header.recursionDesired = true
-	// packet.header.z = false
-	// packet.questions = append(packet.questions, NewDnsQuestion(qname, A))
-
-	// reqBuf := NewPacket()
-	// packet.toBuffer(&reqBuf)
-
 	num, err := (*upstream).Write(recBuf.buf[0:recBuf.pos])
 	if err != nil {
 		fmt.Printf("Some error while writing%v", err)
@@ -114,7 +102,7 @@ func worker(wg *sync.WaitGroup, debug bool, conn *net.UDPConn, addr *net.UDPAddr
 	}
 
 	fmt.Printf("Wrote %#v bytes\n", num)
-	// fmt.Printf("%#v", reqBuf.buf[0:reqBuf.pos])
+
 	resBuf := NewPacket()
 
 	num, err = bufio.NewReader(*upstream).Read(resBuf.buf[:])
